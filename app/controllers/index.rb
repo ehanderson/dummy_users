@@ -1,11 +1,17 @@
+require 'pry'
+enable :sessions
+
 get '/' do
- # Look in app/views/index.erb
+ session[:authetic] = nil
  erb :index
 end
 
 get '/users_only' do
-
-  erb :users_page
+  if session[:authetic] == true
+    erb :users_page
+  else
+    erb :not_a_user
+  end
 end
 
 get '/create_account' do
@@ -13,7 +19,9 @@ get '/create_account' do
   erb :create_account
 end
 
-post '/new_user' do
+post '/login' do  
+  @user = User.authenticate(params[:email], params[:password])
+  @user.nil? ? session[:authetic] = false : session[:authetic] = true
 
-  redirect to '/'
+  redirect to '/users_only'
 end
